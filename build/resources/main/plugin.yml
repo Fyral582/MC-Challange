@@ -1,0 +1,36 @@
+name: Challange
+version: 1.0
+main: de.Fyral.challange.Main
+api-version: 1.20
+
+commands:
+  settings:
+    description: Opens the settings menu
+    permission: challange.settings
+    permission-message: "§cYou do not have permission for this!"
+  pause:
+    description: Pauses the challenge
+    permission: challange.pause
+    permission-message: "§cYou do not have permission for this!"
+  resume:
+    description: Resumes the challenge
+    permission: challange.resume
+    permission-message: "§cYou do not have permission for this!"
+  reset:
+    description: Resets everything
+    permission: challange.reset
+    permission-message: "§cYou do not have permission for this!"
+
+permissions:
+  challange.settings:
+    description: Allows managing the settings
+    default: op
+  challange.pause:
+    description: Allows pausing the challenge
+    default: op
+  challange.resume:
+    description: Allows resuming the challenge
+    default: op
+  challange.reset:
+    description: Allows resetting the challenge
+    default: op
