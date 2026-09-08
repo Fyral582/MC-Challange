@@ -1,0 +1,37 @@
+name: Challange
+version: 1.0
+main: de.Fyral.challange.Main
+api-version: 21.1
+commands:
+  settings:
+    description: Oeffnet das Settings-GUI
+    permission: challange.settings
+  pause:
+    description: Pausiert die Challenge
+    permission: challange.pause
+  resume:
+    description: Startet die Challenge
+    permission: challange.resume
+  reset:
+    description: Resettet die Welt und das Spiel
+    permission: challange.reset
+  activechallanges:
+    description: Zeigt alle aktiven Challenges an
+    permission: challange.activechallanges
+
+permissions:
+  challange.settings:
+    description: Erlaubt das Verwalten der Settings
+    default: op
+  challange.pause:
+    description: Erlaubt das Pausieren der Challenge
+    default: op
+  challange.resume:
+    description: Erlaubt das Fortsetzen der Challenge
+    default: op
+  challange.reset:
+    description: Erlaubt den Challenge-Reset
+    default: op
+  challange.activechallanges:
+    description: Erlaubt das Anschauen der aktiven Challenges
+    default: op

@@ -1,0 +1,89 @@
+messages:
+  commands:
+    no_permission: "&cYou don't have permission for this!"
+    settings_running: "&cYou cannot open the settings while a challenge is running!"
+    pause_already_paused: "&cThe challenge is already paused!"
+    pause_success: "&eThe challenge has been paused!"
+    resume_already_running: "&cThe challenge is already running!"
+    resume_none_active: "&cNo challenge is enabled! Open /settings first."
+    resume_success: "&aThe challenge has been started/resumed!"
+    reset_start: "&4RESET &7Generating new world..."
+    reset_success: "&aThe new world was generated successfully!"
+    already_running: "&cAlready running!"
+    reset_cancelled: "&cReset cancelled."
+  gui:
+    settings_title: "&8Challenge Settings"
+    reset_title: "&4Confirm reset?"
+    reset_confirm: "&a&lYes, perform reset"
+    reset_cancel: "&c&lCancel"
+    block_randomizer_active: "&aBlock Randomizer: ON"
+    block_randomizer_inactive: "&cBlock Randomizer: OFF"
+    random_effect_active: "&aRandom Effect: ON"
+    random_effect_inactive: "&cRandom Effect: OFF"
+    random_size_active: "&aRandom Size: ON"
+    random_size_inactive: "&cRandom Size: OFF"
+    chunk_wipe_active: "&aChunk Wipe: ON"
+    chunk_wipe_inactive: "&cChunk Wipe: OFF"
+    random_teleport_active: "&aRandom Teleport: ON"
+    random_teleport_inactive: "&cRandom Teleport: OFF"
+    challenge_start: "&a&lStart Challenge"
+    ultrahardcore_active: "&aUltra Hardcore: ON"
+    ultrahardcore_inactive: "&cUltra Hardcore: OFF"
+    no_crafting_active: "&aNo Crafting: ON"
+    no_crafting_inactive: "&cNo Crafting: OFF"
+    no_armor_active: "&aNo Armor: ON"
+    no_armor_inactive: "&cNo Armor: OFF"
+    random_crafting_active: "&aRandom Crafting: ON"
+    random_crafting_inactive: "&cRandom Crafting: OFF"
+  activechallanges:
+    header: "&6=== Active Challenges ==="
+    block_randomizer: "&7Block Randomizer:"
+    random_effect: "&7Random Effect:"
+    entity_size: "&7Random Size:"
+    chunk_wipe: "&7Chunk Wipe:"
+    random_teleport: "&7Random Teleport:"
+    ultra_hardcore: "&7Ultra Hardcore:"
+    no_crafting: "&7No Crafting Table:"
+    no_armor: "&7No Armor:"
+    random_crafting: "&7Random Crafting:"
+    active: "&a✓ ON"
+    inactive: "&c✗ OFF"
+  timer:
+    actionbar: "&6Challenge Time: &e%time%"
+    paused_empty: "&cAll players have left the server. Timer has been paused."
+  titles:
+    win:
+      title: "&a&lCHALLENGE WON!"
+      subtitle: "&eThe Ender Dragon has been defeated!"
+    death:
+      title: "&c&lCHALLENGE LOST!"
+      subtitle: "&eSomeone has died!"
+  chunkwipe:
+    bossbar_start: "&cChunk is being deleted..."
+    bossbar_timer: "&cChunk wipe in: &e%time%s"
+  entitysize:
+    resized: "&b&lCHALLENGE &7-> &fAll creatures have been randomly resized!"
+  randomeffekt:
+    received: "&d&lEFFECT &7-> &fYou received the effect &e%effect% %count% &f."
+    no_milk: "&cYou cannot drink milk during this challenge!"
+  randomteleport:
+    teleported: "&6&lTELEPORT &7to &e%x% %y% %z% &7(&f%world%&7)"
+    world_overworld: "Overworld"
+    world_nether: "Nether"
+    world_end: "End"
+  nocrafting:
+    blocked: "&cYou cannot use a crafting table during this challenge!"
+  noarmor:
+    locked_slot: "&cArmor locked"
+
+challenges:
+  ultrahardcore:
+    name: "&6&lUltra Hardcore"
+    status_active: "&a&lEnabled"
+    status_inactive: "&c&lDisabled"
+    lore:
+      - "&7Status: %status%"
+      - ""
+      - "&7Natural regeneration is turned off!"
+      - "&7You only heal through golden apples,"
+      - "&7potions or soup."
