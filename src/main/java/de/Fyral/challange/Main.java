@@ -41,6 +41,7 @@ import java.util.List;
 public class Main extends JavaPlugin implements Listener {
 
     private static Main instance;
+    private static final int PRELOAD_RADIUS = 4;
     private boolean isRunning = false;
     private FileConfiguration languageConfig;
     private Database database;
@@ -114,6 +115,7 @@ public class Main extends JavaPlugin implements Listener {
         }
 
         loadActiveWorld();
+        Bukkit.getScheduler().runTaskLater(this, this::prepareNextWorld, 100L);
 
         for (World world : Bukkit.getWorlds()) {
             applyDifficulty(world);
@@ -249,26 +251,65 @@ public class Main extends JavaPlugin implements Listener {
         getBackpack().reset();
 
         String oldWorldName = getConfig().getString("activeWorld", "");
-        if (!oldWorldName.isEmpty() && Bukkit.getWorld(oldWorldName) != null) {
+        World newWorld = takeNextWorld();
+
+        getConfig().set("activeWorld", newWorld.getName());
+        saveConfig();
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            resetPlayerState(p, newWorld);
+        }
+        getUltraHardcore().reset();
+        newWorld.removePluginChunkTickets(this);
+
+        // Erst entladen, wenn niemand mehr drin ist, sonst verweigert Bukkit das Unload
+        if (!oldWorldName.isEmpty() && !oldWorldName.equals(newWorld.getName()) && Bukkit.getWorld(oldWorldName) != null) {
             Bukkit.unloadWorld(oldWorldName, false);
         }
+        Bukkit.broadcastMessage(getMessage("messages.commands.reset_success"));
 
-        Bukkit.getScheduler().runTaskLater(this, () -> {
-            String worldName = "worlds/challenge_" + System.currentTimeMillis();
+        // Die naechste Welt etwas spaeter erzeugen, damit der Lag-Spike nicht direkt beim Reset kommt
+        Bukkit.getScheduler().runTaskLater(this, this::prepareNextWorld, 200L);
+    }
 
-            WorldCreator creator = new WorldCreator(worldName);
-            World newWorld = Bukkit.createWorld(creator);
-            applyDifficulty(newWorld);
-            getUltraHardcore().reset();
+    private World takeNextWorld() {
+        String nextName = getConfig().getString("nextWorld", "");
+        World world = nextName.isEmpty() ? null : Bukkit.getWorld(nextName);
+        if (world == null && !nextName.isEmpty()) {
+            world = new WorldCreator(nextName).createWorld();
+        }
+        if (world == null) {
+            world = new WorldCreator("worlds/challenge_" + System.currentTimeMillis()).createWorld();
+        }
+        applyDifficulty(world);
+        getConfig().set("nextWorld", "");
+        return world;
+    }
 
-            getConfig().set("activeWorld", worldName);
+    // Haelt immer eine fertig generierte Welt mit geladenem Spawn bereit, damit der Reset sofort geht
+    private void prepareNextWorld() {
+        String nextName = getConfig().getString("nextWorld", "");
+        World world = nextName.isEmpty() ? null : Bukkit.getWorld(nextName);
+        if (world == null && !nextName.isEmpty()) {
+            world = new WorldCreator(nextName).createWorld();
+        }
+        if (world == null) {
+            nextName = "worlds/challenge_" + System.currentTimeMillis();
+            world = new WorldCreator(nextName).createWorld();
+            if (world == null) return;
+            getConfig().set("nextWorld", nextName);
             saveConfig();
+        }
+        applyDifficulty(world);
 
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                resetPlayerState(p, newWorld);
+        Location spawn = world.getSpawnLocation();
+        int centerX = spawn.getBlockX() >> 4;
+        int centerZ = spawn.getBlockZ() >> 4;
+        for (int dx = -PRELOAD_RADIUS; dx <= PRELOAD_RADIUS; dx++) {
+            for (int dz = -PRELOAD_RADIUS; dz <= PRELOAD_RADIUS; dz++) {
+                world.getChunkAtAsync(centerX + dx, centerZ + dz).thenAccept(chunk -> chunk.addPluginChunkTicket(this));
             }
-            Bukkit.broadcastMessage(getMessage("messages.commands.reset_success"));
-        }, 60L);
+        }
     }
 
     @EventHandler
