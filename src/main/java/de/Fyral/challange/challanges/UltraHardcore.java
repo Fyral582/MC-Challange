@@ -64,6 +64,6 @@ public class UltraHardcore {
     }
 
     public void reset() {
-        setActive(false);
+        setActive(isActive);
     }
 }

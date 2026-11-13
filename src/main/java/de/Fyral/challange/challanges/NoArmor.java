@@ -70,6 +70,5 @@ public class NoArmor implements Listener {
     }
 
     public void reset() {
-        setActive(false);
     }
 }

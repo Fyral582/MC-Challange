@@ -58,13 +58,7 @@ public class commands implements CommandExecutor {
                 return true;
             }
 
-            boolean anyActive = plugin.getRandomEffekt().isActive() || plugin.getRandomTeleport().isActive() ||
-                    plugin.getChunkWipe().isActive() || plugin.getBlockRandomizer().isActive() ||
-                    plugin.getEntitySizeRandomizer().isActive() || plugin.getUltraHardcore().isActive() ||
-                    plugin.getNoCraftingTable().isActive() || plugin.getNoArmor().isActive() ||
-                    plugin.getRandomCrafting().isActive();
-
-            if (!anyActive) {
+            if (!plugin.isAnyChallengeActive()) {
                 player.sendMessage(plugin.getMessage("messages.commands.resume_none_active"));
                 return true;
             }
@@ -80,6 +74,15 @@ public class commands implements CommandExecutor {
                 return true;
             }
             gui.openResetConfirmation(player);
+            return true;
+        }
+
+        if (command.getName().equalsIgnoreCase("bp")) {
+            if (!plugin.getBackpack().isActive()) {
+                player.sendMessage(plugin.getMessage("messages.backpack.disabled"));
+                return true;
+            }
+            plugin.getBackpack().open(player);
             return true;
         }
 
@@ -99,6 +102,10 @@ public class commands implements CommandExecutor {
             sender.sendMessage(plugin.getMessage("messages.activechallanges.no_crafting") + " " + (plugin.getNoCraftingTable().isActive() ? plugin.getMessage("messages.activechallanges.active") : plugin.getMessage("messages.activechallanges.inactive")));
             sender.sendMessage(plugin.getMessage("messages.activechallanges.no_armor") + " " + (plugin.getNoArmor().isActive() ? plugin.getMessage("messages.activechallanges.active") : plugin.getMessage("messages.activechallanges.inactive")));
             sender.sendMessage(plugin.getMessage("messages.activechallanges.random_crafting") + " " + (plugin.getRandomCrafting().isActive() ? plugin.getMessage("messages.activechallanges.active") : plugin.getMessage("messages.activechallanges.inactive")));
+            sender.sendMessage(plugin.getMessage("messages.activechallanges.shared_health") + " " + (plugin.getSharedHealth().isActive() ? plugin.getMessage("messages.activechallanges.active") : plugin.getMessage("messages.activechallanges.inactive")));
+            sender.sendMessage(plugin.getMessage("messages.activechallanges.shared_hunger") + " " + (plugin.getSharedHunger().isActive() ? plugin.getMessage("messages.activechallanges.active") : plugin.getMessage("messages.activechallanges.inactive")));
+            sender.sendMessage(plugin.getMessage("messages.activechallanges.shared_armor") + " " + (plugin.getSharedArmor().isActive() ? plugin.getMessage("messages.activechallanges.active") : plugin.getMessage("messages.activechallanges.inactive")));
+            sender.sendMessage(plugin.getMessage("messages.activechallanges.backpack") + " " + (plugin.getBackpack().isActive() ? plugin.getMessage("messages.activechallanges.active") : plugin.getMessage("messages.activechallanges.inactive")));
             return true;
         }
 

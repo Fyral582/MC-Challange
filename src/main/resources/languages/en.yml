@@ -35,6 +35,14 @@ messages:
     no_armor_inactive: "&cNo Armor: OFF"
     random_crafting_active: "&aRandom Crafting: ON"
     random_crafting_inactive: "&cRandom Crafting: OFF"
+    backpack_active: "&aBackpack (/bp): ON"
+    backpack_inactive: "&cBackpack (/bp): OFF"
+    shared_health_active: "&aShared Health: ON"
+    shared_health_inactive: "&cShared Health: OFF"
+    shared_hunger_active: "&aShared Hunger: ON"
+    shared_hunger_inactive: "&cShared Hunger: OFF"
+    shared_armor_active: "&aShared Armor: ON"
+    shared_armor_inactive: "&cShared Armor: OFF"
   activechallanges:
     header: "&6=== Active Challenges ==="
     block_randomizer: "&7Block Randomizer:"
@@ -46,6 +54,10 @@ messages:
     no_crafting: "&7No Crafting Table:"
     no_armor: "&7No Armor:"
     random_crafting: "&7Random Crafting:"
+    shared_health: "&7Shared Health:"
+    shared_hunger: "&7Shared Hunger:"
+    shared_armor: "&7Shared Armor:"
+    backpack: "&7Backpack:"
     active: "&a✓ ON"
     inactive: "&c✗ OFF"
   timer:
@@ -75,6 +87,9 @@ messages:
     blocked: "&cYou cannot use a crafting table during this challenge!"
   noarmor:
     locked_slot: "&cArmor locked"
+  backpack:
+    title: "&6Backpack"
+    disabled: "&cThe backpack is not enabled!"
 
 challenges:
   ultrahardcore:

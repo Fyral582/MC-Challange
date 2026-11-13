@@ -1,0 +1,20 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "minecraft:custom_model_data",
+    "index": 0,
+    "cases": [
+      {
+        "when": "challange:reset_cancel",
+        "model": {
+          "type": "minecraft:model",
+          "model": "challange:item/reset_cancel"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "minecraft:block/red_wool"
+    }
+  }
+}

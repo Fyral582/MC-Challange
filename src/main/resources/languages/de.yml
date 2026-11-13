@@ -35,6 +35,14 @@ messages:
     no_armor_inactive: "&cKeine Rüstung: AUS"
     random_crafting_active: "&aRandom Crafting: AN"
     random_crafting_inactive: "&cRandom Crafting: AUS"
+    backpack_active: "&aBackpack (/bp): AN"
+    backpack_inactive: "&cBackpack (/bp): AUS"
+    shared_health_active: "&aGeteilte Leben: AN"
+    shared_health_inactive: "&cGeteilte Leben: AUS"
+    shared_hunger_active: "&aGeteilter Hunger: AN"
+    shared_hunger_inactive: "&cGeteilter Hunger: AUS"
+    shared_armor_active: "&aGeteilte Rüstung: AN"
+    shared_armor_inactive: "&cGeteilte Rüstung: AUS"
   activechallanges:
     header: "&6=== Aktive Challenges ==="
     block_randomizer: "&7Block Randomizer:"
@@ -46,6 +54,10 @@ messages:
     no_crafting: "&7Kein Crafting-Tisch:"
     no_armor: "&7Keine Rüstung:"
     random_crafting: "&7Random Crafting:"
+    shared_health: "&7Geteilte Leben:"
+    shared_hunger: "&7Geteilter Hunger:"
+    shared_armor: "&7Geteilte Rüstung:"
+    backpack: "&7Backpack:"
     active: "&a✓ AN"
     inactive: "&c✗ AUS"
   timer:
@@ -75,6 +87,9 @@ messages:
     blocked: "&cDu kannst während dieser Challenge keinen Crafting-Tisch benutzen!"
   noarmor:
     locked_slot: "&cRüstung gesperrt"
+  backpack:
+    title: "&6Backpack"
+    disabled: "&cDer Backpack ist nicht aktiviert!"
 
 challenges:
   ultrahardcore:

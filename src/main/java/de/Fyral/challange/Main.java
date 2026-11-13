@@ -23,10 +23,19 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.Difficulty;
+import org.bukkit.advancement.Advancement;
+import org.bukkit.advancement.AdvancementProgress;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.potion.PotionEffect;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Main extends JavaPlugin implements Listener {
@@ -45,6 +54,10 @@ public class Main extends JavaPlugin implements Listener {
     private NoCraftingTable noCraftingTable;
     private NoArmor noArmor;
     private RandomCrafting randomCrafting;
+    private Backpack backpack;
+    private SharedHealth sharedHealth;
+    private SharedHunger sharedHunger;
+    private SharedArmor sharedArmor;
     private GUI gui;
     private int secondsElapsed = 0;
 
@@ -72,6 +85,10 @@ public class Main extends JavaPlugin implements Listener {
         noCraftingTable = new NoCraftingTable();
         noArmor = new NoArmor();
         randomCrafting = new RandomCrafting();
+        backpack = new Backpack();
+        sharedHealth = new SharedHealth();
+        sharedHunger = new SharedHunger();
+        sharedArmor = new SharedArmor();
         gui = new GUI(this);
 
         blockRandomizer.setActive(getConfig().getBoolean("challenges.block_randomizer", false));
@@ -85,6 +102,10 @@ public class Main extends JavaPlugin implements Listener {
         randomCrafting.setActive(getConfig().getBoolean("challenges.random_crafting", false));
         if (randomCrafting.isActive()) randomCrafting.generatePossibleResults();
         ultraHardcore.setActive(getConfig().getBoolean("challenges.ultrahardcore", false));
+        backpack.setActive(getConfig().getBoolean("settings.backpack", false));
+        sharedHealth.setActive(getConfig().getBoolean("challenges.shared_health", false));
+        sharedHunger.setActive(getConfig().getBoolean("challenges.shared_hunger", false));
+        sharedArmor.setActive(getConfig().getBoolean("challenges.shared_armor", false));
 
         if (isRunning) {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tick unfreeze");
@@ -104,6 +125,7 @@ public class Main extends JavaPlugin implements Listener {
         getCommand("resume").setExecutor(cmdExecutor);
         getCommand("reset").setExecutor(cmdExecutor);
         getCommand("activechallanges").setExecutor(cmdExecutor);
+        getCommand("bp").setExecutor(cmdExecutor);
 
         getServer().getPluginManager().registerEvents(gui, this);
         getServer().getPluginManager().registerEvents(blockRandomizer, this);
@@ -112,6 +134,10 @@ public class Main extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(noCraftingTable, this);
         getServer().getPluginManager().registerEvents(noArmor, this);
         getServer().getPluginManager().registerEvents(randomCrafting, this);
+        getServer().getPluginManager().registerEvents(backpack, this);
+        getServer().getPluginManager().registerEvents(sharedHealth, this);
+        getServer().getPluginManager().registerEvents(sharedHunger, this);
+        getServer().getPluginManager().registerEvents(sharedArmor, this);
         getServer().getPluginManager().registerEvents(this, this);
 
         getServer().getScheduler().runTaskTimer(this, () -> {
@@ -151,7 +177,15 @@ public class Main extends JavaPlugin implements Listener {
         getConfig().set("challenges.no_armor", noArmor.isActive());
         getConfig().set("challenges.random_crafting", randomCrafting.isActive());
         getConfig().set("challenges.ultrahardcore", ultraHardcore.isActive());
+        getConfig().set("challenges.shared_health", sharedHealth.isActive());
+        getConfig().set("challenges.shared_hunger", sharedHunger.isActive());
+        getConfig().set("challenges.shared_armor", sharedArmor.isActive());
+        getConfig().set("settings.backpack", backpack.isActive());
         saveConfig();
+
+        if (backpack != null) {
+            backpack.save();
+        }
 
         if (database != null) {
             database.disconnect();
@@ -209,6 +243,10 @@ public class Main extends JavaPlugin implements Listener {
         getNoCraftingTable().reset();
         getNoArmor().reset();
         getRandomCrafting().reset();
+        getSharedHealth().reset();
+        getSharedHunger().reset();
+        getSharedArmor().reset();
+        getBackpack().reset();
 
         String oldWorldName = getConfig().getString("activeWorld", "");
         if (!oldWorldName.isEmpty() && Bukkit.getWorld(oldWorldName) != null) {
@@ -221,6 +259,7 @@ public class Main extends JavaPlugin implements Listener {
             WorldCreator creator = new WorldCreator(worldName);
             World newWorld = Bukkit.createWorld(creator);
             applyDifficulty(newWorld);
+            getUltraHardcore().reset();
 
             getConfig().set("activeWorld", worldName);
             saveConfig();
@@ -261,11 +300,27 @@ public class Main extends JavaPlugin implements Listener {
     private void resetPlayerState(Player p, World world) {
         p.getInventory().clear();
         p.getInventory().setArmorContents(null);
-        p.setHealth(20.0);
+        p.getEnderChest().clear();
+        p.setItemOnCursor(null);
+        for (PotionEffect effect : p.getActivePotionEffects()) {
+            p.removePotionEffect(effect.getType());
+        }
+        AttributeInstance maxHealth = p.getAttribute(Attribute.MAX_HEALTH);
+        p.setHealth(maxHealth != null ? maxHealth.getValue() : 20.0);
+        p.setAbsorptionAmount(0);
         p.setFoodLevel(20);
         p.setSaturation(20.0f);
+        p.setExhaustion(0f);
+        p.setFireTicks(0);
+        p.setFreezeTicks(0);
+        p.setFallDistance(0f);
+        p.setRemainingAir(p.getMaximumAir());
         p.setExp(0f);
         p.setLevel(0);
+        p.setTotalExperience(0);
+        p.setRespawnLocation(null, true);
+        p.undiscoverRecipes(new ArrayList<>(p.getDiscoveredRecipes()));
+        revokeAllAdvancements(p);
         p.setGameMode(GameMode.SURVIVAL);
 
         if (world != null) {
@@ -273,6 +328,16 @@ public class Main extends JavaPlugin implements Listener {
             int safeY = world.getHighestBlockYAt(spawn.getBlockX(), spawn.getBlockZ(), org.bukkit.HeightMap.MOTION_BLOCKING);
             spawn.setY(safeY + 1);
             p.teleport(spawn);
+        }
+    }
+
+    private void revokeAllAdvancements(Player p) {
+        Iterator<Advancement> iterator = Bukkit.advancementIterator();
+        while (iterator.hasNext()) {
+            AdvancementProgress progress = p.getAdvancementProgress(iterator.next());
+            for (String criteria : progress.getAwardedCriteria()) {
+                progress.revokeCriteria(criteria);
+            }
         }
     }
 
@@ -317,6 +382,11 @@ public class Main extends JavaPlugin implements Listener {
             }
         }
         languageConfig = YamlConfiguration.loadConfiguration(langFile);
+
+        InputStream defaultLang = getResource("languages/" + lang + ".yml");
+        if (defaultLang != null) {
+            languageConfig.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(defaultLang, StandardCharsets.UTF_8)));
+        }
     }
 
     public static Main getInstance() {
@@ -356,16 +426,6 @@ public class Main extends JavaPlugin implements Listener {
         this.secondsElapsed = 0;
         getConfig().set("challenge-time", 0);
         getConfig().set("is-running", false);
-
-        getConfig().set("challenges.block_randomizer", false);
-        getConfig().set("challenges.chunk_wipe", false);
-        getConfig().set("challenges.entity_size", false);
-        getConfig().set("challenges.random_effect", false);
-        getConfig().set("challenges.random_teleport", false);
-        getConfig().set("challenges.no_crafting_table", false);
-        getConfig().set("challenges.ultrahardcore", false);
-        getConfig().set("challenges.no_armor", false);
-        getConfig().set("challenges.random_crafting", false);
         saveConfig();
 
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tick freeze");
@@ -376,7 +436,9 @@ public class Main extends JavaPlugin implements Listener {
     }
 
     public String getMessage(String path) {
-        String msg = languageConfig.getString(path, "&cMessage not found: " + path);
+        // getString(path) ohne Default, damit die Defaults aus der Jar-Sprachdatei greifen
+        String msg = languageConfig.getString(path);
+        if (msg == null) msg = "&cMessage not found: " + path;
         return ChatColor.translateAlternateColorCodes('&', msg);
     }
 
@@ -403,4 +465,15 @@ public class Main extends JavaPlugin implements Listener {
     public NoCraftingTable getNoCraftingTable() { return noCraftingTable; }
     public NoArmor getNoArmor() { return noArmor; }
     public RandomCrafting getRandomCrafting() { return randomCrafting; }
+    public Backpack getBackpack() { return backpack; }
+    public SharedHealth getSharedHealth() { return sharedHealth; }
+    public SharedHunger getSharedHunger() { return sharedHunger; }
+    public SharedArmor getSharedArmor() { return sharedArmor; }
+
+    public boolean isAnyChallengeActive() {
+        return randomEffekt.isActive() || randomTeleport.isActive() || chunkWipe.isActive() ||
+                blockRandomizer.isActive() || entitySizeRandomizer.isActive() || ultraHardcore.isActive() ||
+                noCraftingTable.isActive() || noArmor.isActive() || randomCrafting.isActive() ||
+                sharedHealth.isActive() || sharedHunger.isActive() || sharedArmor.isActive();
+    }
 }

@@ -1,0 +1,20 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "minecraft:custom_model_data",
+    "index": 0,
+    "cases": [
+      {
+        "when": "challange:random_teleport",
+        "model": {
+          "type": "minecraft:model",
+          "model": "challange:item/random_teleport"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "minecraft:item/ender_pearl"
+    }
+  }
+}
