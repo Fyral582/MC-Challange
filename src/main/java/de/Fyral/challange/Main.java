@@ -276,12 +276,10 @@ public class Main extends JavaPlugin implements Listener {
         }
         Bukkit.broadcastMessage(getMessage("messages.commands.reset_success"));
 
-        // createWorld blockiert den Server einige Sekunden. Kurz warten, damit Teleport und Nachricht vorher bei den Spielern ankommen
+        // createWorld blockiert den Server kurz. Etwas warten, damit der Teleport vorher bei den Spielern ankommt
         Bukkit.getScheduler().runTaskLater(this, () -> {
             if (!getConfig().getString("nextWorld", "").isEmpty()) return;
-            Bukkit.broadcastMessage(getMessage("messages.commands.next_world_preparing"));
             prepareNextWorld();
-            Bukkit.broadcastMessage(getMessage("messages.commands.next_world_ready"));
         }, 40L);
     }
 

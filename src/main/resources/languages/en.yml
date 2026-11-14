@@ -9,8 +9,6 @@ messages:
     resume_success: "&aThe challenge has been started/resumed!"
     reset_start: "&4RESET &7Generating new world..."
     reset_success: "&aThe new world was generated successfully!"
-    next_world_preparing: "&7Preparing the next world, the server may freeze for a moment..."
-    next_world_ready: "&aThe next world is ready."
     already_running: "&cAlready running!"
     reset_cancelled: "&cReset cancelled."
   gui:
