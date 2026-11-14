@@ -127,7 +127,7 @@ public class GUI implements Listener {
         } else if (slot == 10) {
             boolean newState = !plugin.getBlockRandomizer().isActive();
             plugin.getBlockRandomizer().setActive(newState);
-            if (newState) plugin.getBlockRandomizer().generateMappings();
+            if (newState) plugin.getBlockRandomizer().ensureMappings();
             plugin.getConfig().set("challenges.block_randomizer", newState);
             update = true;
         } else if (slot == 11) {

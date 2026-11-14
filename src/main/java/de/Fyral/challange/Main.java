@@ -93,7 +93,7 @@ public class Main extends JavaPlugin implements Listener {
         gui = new GUI(this);
 
         blockRandomizer.setActive(getConfig().getBoolean("challenges.block_randomizer", false));
-        if (blockRandomizer.isActive()) blockRandomizer.generateMappings();
+        if (blockRandomizer.isActive()) blockRandomizer.ensureMappings();
         chunkWipe.setActive(getConfig().getBoolean("challenges.chunk_wipe", false));
         entitySizeRandomizer.setActive(getConfig().getBoolean("challenges.entity_size", false));
         randomEffekt.setActive(getConfig().getBoolean("challenges.random_effect", false));
