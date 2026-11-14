@@ -240,6 +240,7 @@ public class Main extends JavaPlugin implements Listener {
         getRandomEffekt().resetEffekte();
         getRandomTeleport().reset();
         getChunkWipe().reset();
+        getBlockRandomizer().reset();
         getEntitySizeRandomizer().reset();
         getUltraHardcore().reset();
         getNoCraftingTable().reset();
