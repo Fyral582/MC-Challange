@@ -115,7 +115,8 @@ public class Main extends JavaPlugin implements Listener {
         }
 
         loadActiveWorld();
-        Bukkit.getScheduler().runTaskLater(this, this::prepareNextWorld, 100L);
+        // Beim Serverstart ist noch niemand online, deshalb stoert der Lag beim Generieren hier nicht
+        prepareNextWorld();
 
         for (World world : Bukkit.getWorlds()) {
             applyDifficulty(world);
@@ -199,6 +200,13 @@ public class Main extends JavaPlugin implements Listener {
             pauseTimer();
             Bukkit.broadcastMessage(getMessage("messages.timer.paused_empty"));
         }
+
+        // Fehlt die vorgenerierte Welt (nach einem Reset), wird sie erst erzeugt, wenn der Server leer ist
+        if (Bukkit.getOnlinePlayers().size() - 1 <= 0 && getConfig().getString("nextWorld", "").isEmpty()) {
+            Bukkit.getScheduler().runTaskLater(this, () -> {
+                if (Bukkit.getOnlinePlayers().isEmpty()) prepareNextWorld();
+            }, 20L);
+        }
     }
 
     @EventHandler
@@ -268,8 +276,8 @@ public class Main extends JavaPlugin implements Listener {
         }
         Bukkit.broadcastMessage(getMessage("messages.commands.reset_success"));
 
-        // Die naechste Welt etwas spaeter erzeugen, damit der Lag-Spike nicht direkt beim Reset kommt
-        Bukkit.getScheduler().runTaskLater(this, this::prepareNextWorld, 200L);
+        // Keine neue Welt erzeugen, solange Spieler online sind: createWorld blockiert den Server mehrere Sekunden
+        if (Bukkit.getOnlinePlayers().isEmpty()) prepareNextWorld();
     }
 
     private World takeNextWorld() {
