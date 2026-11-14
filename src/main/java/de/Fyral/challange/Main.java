@@ -167,7 +167,6 @@ public class Main extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        reloadConfig();
         getConfig().set("challenge-time", secondsElapsed);
         getConfig().set("is-running", isRunning);
         getConfig().set("challenges.block_randomizer", blockRandomizer.isActive());

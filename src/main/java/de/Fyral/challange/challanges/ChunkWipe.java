@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.World;
 
@@ -19,6 +20,14 @@ public class ChunkWipe {
     private final Map<String, Integer> chunkTimers = new HashMap<>();
     private final Map<String, BossBar> chunkBars = new HashMap<>();
 
+    public ChunkWipe() {
+        ConfigurationSection saved = Main.getInstance().getConfig().getConfigurationSection("state.chunk_wipe");
+        if (saved == null) return;
+        for (String key : saved.getKeys(false)) {
+            startChunkTimer(key, saved.getInt(key, 60));
+        }
+    }
+
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { this.isActive = active; }
 
@@ -30,7 +39,7 @@ public class ChunkWipe {
             String chunkKey = getChunkKey(chunk);
 
             if (!chunkTimers.containsKey(chunkKey)) {
-                startChunkTimer(chunk, chunkKey);
+                startChunkTimer(chunkKey, 60);
             }
 
             updateBossBarVisibility(player, chunkKey);
@@ -39,8 +48,8 @@ public class ChunkWipe {
         updateTimers();
     }
 
-    private void startChunkTimer(Chunk chunk, String key) {
-        chunkTimers.put(key, 60);
+    private void startChunkTimer(String key, int seconds) {
+        chunkTimers.put(key, seconds);
         String title = Main.getInstance().getMessage("messages.chunkwipe.bossbar_start");
         BossBar bar = Bukkit.createBossBar(title, BarColor.RED, BarStyle.SOLID);
         chunkBars.put(key, bar);
@@ -64,6 +73,12 @@ public class ChunkWipe {
                 }
             }
         }
+        saveState();
+    }
+
+    private void saveState() {
+        Main.getInstance().getConfig().set("state.chunk_wipe", null);
+        Main.getInstance().getConfig().createSection("state.chunk_wipe", chunkTimers);
     }
 
     private void updateBossBarVisibility(Player player, String currentChunkKey) {
@@ -105,6 +120,7 @@ public class ChunkWipe {
         for (BossBar bar : chunkBars.values()) bar.removeAll();
         chunkBars.clear();
         chunkTimers.clear();
+        saveState();
     }
 
     private String getChunkKey(Chunk chunk) {

@@ -25,7 +25,9 @@ public class EntitySizeRandomizer implements Listener {
     private double currentScale = 1.0;
 
     public EntitySizeRandomizer() {
-        setRandomTime();
+        currentScale = Main.getInstance().getConfig().getDouble("state.entity_size.scale", 1.0);
+        secondsUntilNextResize = Main.getInstance().getConfig().getInt("state.entity_size.seconds", 0);
+        if (secondsUntilNextResize <= 0) setRandomTime();
     }
 
     public boolean isActive() { return isActive; }
@@ -40,6 +42,12 @@ public class EntitySizeRandomizer implements Listener {
             applyRandomSizes();
             setRandomTime();
         }
+        saveState();
+    }
+
+    private void saveState() {
+        Main.getInstance().getConfig().set("state.entity_size.scale", currentScale);
+        Main.getInstance().getConfig().set("state.entity_size.seconds", secondsUntilNextResize);
     }
 
     private void applyRandomSizes() {
@@ -90,5 +98,6 @@ public class EntitySizeRandomizer implements Listener {
         }
         currentScale = 1.0;
         setRandomTime();
+        saveState();
     }
 }

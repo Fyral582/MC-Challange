@@ -25,7 +25,8 @@ public class RandomEffekt implements Listener {
 
     public RandomEffekt() {
         activeEffectsList = Main.getInstance().getDatabase().getEffects();
-        setRandomTime();
+        secondsUntilNextEffect = Main.getInstance().getConfig().getInt("state.random_effect.seconds", 0);
+        if (secondsUntilNextEffect <= 0) setRandomTime();
     }
 
     public boolean isActive() { return isActive; }
@@ -40,6 +41,11 @@ public class RandomEffekt implements Listener {
             applyRandomEffect();
             setRandomTime();
         }
+        saveState();
+    }
+
+    private void saveState() {
+        Main.getInstance().getConfig().set("state.random_effect.seconds", secondsUntilNextEffect);
     }
 
     private void applyRandomEffect() {
@@ -119,6 +125,7 @@ public class RandomEffekt implements Listener {
             }
         }
         setRandomTime();
+        saveState();
     }
 
     @EventHandler

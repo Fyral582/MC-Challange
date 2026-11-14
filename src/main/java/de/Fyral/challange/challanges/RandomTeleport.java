@@ -18,7 +18,8 @@ public class RandomTeleport {
     private final Random random = new Random();
 
     public RandomTeleport() {
-        setRandomTime();
+        secondsUntilNextTeleport = Main.getInstance().getConfig().getInt("state.random_teleport.seconds", 0);
+        if (secondsUntilNextTeleport <= 0) setRandomTime();
     }
 
     public boolean isActive() { return isActive; }
@@ -33,6 +34,11 @@ public class RandomTeleport {
             teleportAllPlayersRandomly();
             setRandomTime();
         }
+        saveState();
+    }
+
+    private void saveState() {
+        Main.getInstance().getConfig().set("state.random_teleport.seconds", secondsUntilNextTeleport);
     }
 
     private void teleportAllPlayersRandomly() {
@@ -110,6 +116,7 @@ public class RandomTeleport {
 
     public void reset() {
         setRandomTime();
+        saveState();
     }
 
     private boolean isSafeBlock(Material material) {
