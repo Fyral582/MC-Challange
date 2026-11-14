@@ -276,8 +276,13 @@ public class Main extends JavaPlugin implements Listener {
         }
         Bukkit.broadcastMessage(getMessage("messages.commands.reset_success"));
 
-        // Keine neue Welt erzeugen, solange Spieler online sind: createWorld blockiert den Server mehrere Sekunden
-        if (Bukkit.getOnlinePlayers().isEmpty()) prepareNextWorld();
+        // createWorld blockiert den Server einige Sekunden. Kurz warten, damit Teleport und Nachricht vorher bei den Spielern ankommen
+        Bukkit.getScheduler().runTaskLater(this, () -> {
+            if (!getConfig().getString("nextWorld", "").isEmpty()) return;
+            Bukkit.broadcastMessage(getMessage("messages.commands.next_world_preparing"));
+            prepareNextWorld();
+            Bukkit.broadcastMessage(getMessage("messages.commands.next_world_ready"));
+        }, 40L);
     }
 
     private World takeNextWorld() {
